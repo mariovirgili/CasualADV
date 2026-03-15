@@ -1,0 +1,8 @@
+.pio
+.vscode/
+*.bin
+*.elf
+*.map
+*.mp3
+*.mp4
+*.mid
