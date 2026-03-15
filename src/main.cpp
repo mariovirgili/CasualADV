@@ -9,15 +9,16 @@
 #include "FallTris.h"
 #include "RockADV.h"
 #include "PuzzleBall.h"
+#include "ADVnoid.h"
 #include "CasualADV_logo.h"
 #include "AudioTask.h" 
 
-enum GlobalState { MAIN_MENU, APP_FALLTRIS, APP_ROCKADV, APP_PUZZLEBALL, REMAP_INPUT, MP3_OPTIONS, FILE_MANAGER };
+enum GlobalState { MAIN_MENU, APP_FALLTRIS, APP_ROCKADV, APP_PUZZLEBALL, APP_ADVNOID, REMAP_INPUT, MP3_OPTIONS, FILE_MANAGER };
 GlobalState currentState = MAIN_MENU;
 
-const int NUM_GAMES = 3;
+const int NUM_GAMES = 4;
 int selectedGame = 0;
-String gameNames[] = {"FallTris", "RockADV", "PuzzleBall"};
+String gameNames[] = {"FallTris", "RockADV", "PuzzleBall", "ADVnoid"};
 
 char keyPrev = 'e';
 char keyNext = 'z';
@@ -210,12 +211,17 @@ void drawMainMenu() {
     menuCanvas->setTextSize(1); 
 
     for(int i = 0; i < NUM_GAMES; i++) {
-        int yPos = 85 + (i * 15);
+        int relativePos = i - selectedGame;
+        if (relativePos > NUM_GAMES / 2) relativePos -= NUM_GAMES;
+        if (relativePos < -(NUM_GAMES / 2)) relativePos += NUM_GAMES;
+        int yPos = 100 + (relativePos * 15);
+        if (yPos < 80 || yPos > 130) continue;
+
         if (i == selectedGame) {
             menuCanvas->setTextColor(TFT_YELLOW, TFT_BLACK); 
             menuCanvas->drawCenterString("> " + gameNames[i] + " <", 120, yPos);
         } else {
-            menuCanvas->setTextColor(TFT_WHITE, TFT_BLACK);  
+            menuCanvas->setTextColor(abs(relativePos) == 1 ? TFT_WHITE : TFT_LIGHTGRAY, TFT_BLACK);  
             menuCanvas->drawCenterString(gameNames[i], 120, yPos);
         }
     }
@@ -331,12 +337,12 @@ void launchGame(int gameIndex) {
     if (gameIndex == 0) { currentState = APP_FALLTRIS; setupFallTris(); } 
     else if (gameIndex == 1) { currentState = APP_ROCKADV; setupRockADV(); } 
     else if (gameIndex == 2) { currentState = APP_PUZZLEBALL; setupPuzzleBall(); }
+    else if (gameIndex == 3) { currentState = APP_ADVNOID; setupADVnoid(); }
 }
 
 void loop() {
-    M5Cardputer.update();
-
     if (currentState == MAIN_MENU || currentState == REMAP_INPUT || currentState == MP3_OPTIONS || currentState == FILE_MANAGER) {
+        M5Cardputer.update();
         if (menuCanvas == nullptr) {
             M5Cardputer.Display.setRotation(1);
             menuCanvas = new LGFX_Sprite(&M5Cardputer.Display);
@@ -438,4 +444,5 @@ void loop() {
     else if (currentState == APP_FALLTRIS) { if (!loopFallTris()) { currentState = MAIN_MENU; menuCooldownTime = millis() + 300; lastInputTime = millis(); } }
     else if (currentState == APP_ROCKADV) { if (!loopRockADV()) { currentState = MAIN_MENU; menuCooldownTime = millis() + 300; lastInputTime = millis(); } }
     else if (currentState == APP_PUZZLEBALL) { if (!loopPuzzleBall()) { currentState = MAIN_MENU; menuCooldownTime = millis() + 300; lastInputTime = millis(); } }
+    else if (currentState == APP_ADVNOID) { if (!loopADVnoid()) { currentState = MAIN_MENU; menuCooldownTime = millis() + 300; lastInputTime = millis(); } }
 }

@@ -26,5 +26,7 @@ namespace AudioTask {
     // Track control
     void nextTrack();
     void prevTrack();
+    std::vector<String> getPlaylistCopy();
     String getCurrentTrackName();
+    String getCurrentTrackType();
 }

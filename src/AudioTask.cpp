@@ -152,6 +152,7 @@ namespace AudioTask {
     bool isPlaying() { return (mp3 && mp3->isRunning()); }
     
     void setMP3Volume(uint8_t vol) {
+        mp3Volume = vol;
         mp3Gain = (float)vol / 255.0f;
     }
 
@@ -203,8 +204,16 @@ namespace AudioTask {
         playMP3(("/CasualADV/music/" + playlist[currentTrackIdx]).c_str());
     }
 
+    std::vector<String> getPlaylistCopy() {
+        return playlist;
+    }
+
     String getCurrentTrackName() {
         if (playlist.empty() || currentTrackIdx < 0 || currentTrackIdx >= playlist.size()) return "None";
         return playlist[currentTrackIdx];
+    }
+
+    String getCurrentTrackType() {
+        return isPlaying() ? "MP3" : "Stopped";
     }
 }
